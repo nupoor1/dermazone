@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<!-- Hero Section -->
+<div class="relative bg-base-200" style="height: 300px;">
+    <div class="relative flex items-center justify-center h-full text-center">
+        <div class="max-w-md w-full">
+            <h1 class="text-5xl font-bold">{{ welcome_message }}{{ username }}!</h1>
+            <!-- Logout button is handled in base.html -->
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Section -->
+<div class="w-full flex flex-col items-center p-4">
+    <h2 class="text-4xl font-bold mt-4 mb-6">Load and save a prediction!</h2>
+
+    <form id="uploadForm" class="w-full max-w-xs">
+        <label class="form-control w-full mb-4">
+            <div class="label mb-2">
+                <span class="label-text">Upload an image file</span>
+            </div>
+            <input 
+                type="file" 
+                id="fileInput"
+                class="file-input file-input-bordered w-full"
+                accept="image/*"
+            />
+            <div class="label mt-2">
+                <span class="label-text-alt">*Please submit a picture of your face.</span>
+            </div>
+        </label>
+        <button type="submit" class="btn btn-accent w-full mt-2">Submit</button>
+    </form>
+
+    <div id="result" class="text-center mt-6"></div>
+
+    <div class="w-full max-w-lg mt-8">
+        <h2 class="text-2xl font-bold mb-4 text-center">Your Previous Predictions</h2>
+        <ul class="list-disc pl-5">
+            {% for prediction in predictions %}
+                <li class="mb-2">
+                    <span>{{ prediction.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:</span>
+                    <span class="ml-2">{{ prediction.prediction }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please select an image file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerText = 'Invalid image. Please submit an image of a face.';
+        }
+    });
+</script>
+
+{% endblock %}

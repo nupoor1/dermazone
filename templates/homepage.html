@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<!-- Hero Section with Background Shapes -->
+<div class="relative bg-base-200" style="height: 250px;">
+    <div class="relative flex items-center justify-center h-full text-center">
+        <div class="max-w-md">
+            <h1 class="text-5xl font-bold text-white-200">dermazone.</h1>
+            <p class="py-5 text-lg text-green-400">
+                Building confidence with your skin.
+            </p>
+            
+        </div>
+    </div>
+</div>
+
+<!-- About Us Section -->
+<div class="flex flex-col items-start px-6 py-8 mt-8 ml-10">
+    <div class="flex-1 md:mr-6">
+        <h2 class="text-4xl font-bold mb-6">About Us</h2>
+        <p class="text-base font-medium mb-4">
+            Buying facial products may be a very difficult task, especially when you do not know your skin type. <br />Not only can this be a frustrating experience, but can also cause insecurities and lead to an <br />unhealthy self-image regarding skin.
+            <br />
+            <br />
+            dermazone is an all-in-one software that enables you to determine your skin type by using a CNN <br />and also helps find products for your face, all to ensure you feel confident in and proud of your skin!
+            <br />
+            <br />
+            To save and update your results, sign up for a dermazone account or log in!
+        </p>
+    </div>
+</div>
+
+<!-- File Selection Label and Prediction Results -->
+<div class="w-full flex flex-col items-center">
+    <h2 class="text-4xl font-bold mt-3 mb-3">Try out our CNN!</h2>
+
+    <form id="uploadForm" class="w-full max-w-xs mx-auto mt-4 mb-6">
+        <label class="form-control w-full">
+            <div class="label">
+                <span class="label-text">Upload an image file</span>
+            </div>
+            <input 
+            type="file" 
+            id="fileInput"
+            class="file-input file-input-bordered w-full"
+            accept="image/*"
+            />
+            <div class="label">
+                <span class="label-text-alt">*Please submit a picture of your face.</span>
+            </div>
+        </label>
+        <button type="submit" class="btn btn-accent w-full mt-2">Submit</button>
+    </form>
+
+    <div id="result" class="text-center mt-6"></div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please select an image file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('result').innerText = 'Invalid image. Please submit an image of a face.';
+        }
+    });
+</script>
+
+{% endblock %}
