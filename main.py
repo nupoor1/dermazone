@@ -32,9 +32,44 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    brand = db.Column(db.String(100), nullable=True)
+    skin_type = db.Column(db.String(50), nullable=False)  # oily, dry, normal
+    category = db.Column(db.String(50), nullable=True)
+    price = db.Column(db.Float, nullable=True)
+    image_url = db.Column(db.String(200), nullable=True)
+
+    def __repr__(self):
+        return f'<Product {self.name} ({self.skin_type})>'
+
 # Dynamic welcome messages
 messagelist = ["Welcome, ", "Hope you’re well, ", "Let’s get cooking, ", "Let’s learn about your skin, "]
 displaymessage = random.choice(messagelist)
+
+def score_product(product):
+    score = 0
+
+    # Prefer moisturizers
+    if product.category:
+        if product.category.lower() == "moisturizer":
+            score += 3
+        elif product.category.lower() == "cleanser":
+            score += 2
+        else:
+            score += 1
+
+    # Prefer affordable products
+    if product.price:
+        if product.price < 15:
+            score += 3
+        elif product.price < 25:
+            score += 2
+        else:
+            score += 1
+
+    return score
 
 # Routes
 @app.route('/')
@@ -129,14 +164,10 @@ def predict():
         return jsonify({'error': 'No selected file'}), 400
 
     if file:
-        img = Image.open(io.BytesIO(file.read()))
+        img = Image.open(io.BytesIO(file.read())).convert("RGB")
         img = img.resize((150, 150))
-        img_array = np.array(img)
-
-        img_array = img_array / 255.0
-
+        img_array = np.array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
-        img_array = np.expand_dims(img_array, axis=-1)
 
         predictions = model.predict(img_array)
         class_index = np.argmax(predictions[0])
@@ -150,13 +181,64 @@ def predict():
             db.session.add(new_prediction)
             db.session.commit()
 
-        return jsonify({'prediction': prediction})
+        # Fetch recommended products for this skin type
+        products = Product.query.filter_by(skin_type=prediction).all()
+        ranked_products = sorted(
+            products,
+            key=lambda p: score_product(p),
+            reverse=True
+            )
+        top_products = ranked_products[:3]
+
+        product_list = [
+            {
+        'name': p.name,
+        'brand': p.brand,
+        'category': p.category,
+        'price': p.price,
+        'image_url': p.image_url
+    } for p in top_products
+]
+
+        return jsonify({'prediction': prediction, 'products': product_list})
 
     return jsonify({'error': 'Invalid file'}), 400
 
+@app.route('/admin/add-product', methods=['GET', 'POST'])
+def add_product():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    # simple protection: only allow your account
+    if session['username'] != 'admin':
+        return "Access denied", 403
+
+    if request.method == 'POST':
+        name = request.form['name']
+        brand = request.form['brand']
+        skin_type = request.form['skin_type']
+        category = request.form['category']
+        price = request.form['price']
+        image_url = request.form['image_url']
+
+        product = Product(
+            name=name,
+            brand=brand,
+            skin_type=skin_type,
+            category=category,
+            price=float(price),
+            image_url=image_url
+        )
+
+        db.session.add(product)
+        db.session.commit()
+
+        return redirect(url_for('add_product'))
+
+    return render_template('add_product.html')
 
 
-if __name__ in "__main__":
+if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Product</title>
+</head>
+<body>
+    <h2>Add New Product</h2>
+
+    <form method="POST">
+        <input name="name" placeholder="Product Name" required><br><br>
+        <input name="brand" placeholder="Brand"><br><br>
+
+        <select name="skin_type" required>
+            <option value="dry">Dry</option>
+            <option value="oily">Oily</option>
+            <option value="normal">Normal</option>
+        </select><br><br>
+
+        <input name="category" placeholder="Category (Moisturizer, Cleanser)"><br><br>
+        <input name="price" type="number" step="0.01" placeholder="Price"><br><br>
+        <input name="image_url" placeholder="Image URL"><br><br>
+
+        <button type="submit">Add Product</button>
+    </form>
+</body>
+</html>
