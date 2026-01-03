@@ -1,0 +1,62 @@
+{% extends "base.html" %} 
+{% block body%}
+
+
+<div class="hero bg-base-200 min-h-screen">
+  <div class="hero-content flex-col lg:flex-row-reverse lg:justify-start">
+    <div class="text-center lg:text-left lg:w-1/2 lg:ml-16">
+      <h1 class="text-5xl font-bold">Let's get started!</h1>
+      <p class="py-6">
+        Simply choosing to start is the most crucial step in your skincare journey. Thank you for choosing dermazone.
+      </p>
+    </div>
+    <div class="card bg-base-100 w-full max-w-lg shrink-0 shadow-2xl lg:w-1/2">
+      <div class="card-body">
+        {% if error %}
+        <div class="alert alert-error mb-4">
+          <span>{{ error }}</span>
+        </div>
+        {% endif %}
+        <form id="auth-form" action="{{ url_for('login') }}" method="post">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Username</span>
+            </label>
+            <input type="text" name="username" placeholder="username" class="input input-bordered" required />
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Password</span>
+            </label>
+            <input type="password" name="password" placeholder="password" class="input input-bordered" required />
+            <label class="label">
+              <a href="#" class="label-text-alt link link-hover">Forgot password?</a>
+            </label>
+          </div>
+          <div class="form-control mt-6">
+            <button type="submit" class="btn btn-secondary">Login</button>
+            <button type="button" class="btn btn-primary mt-4" onClick="setActionForm('register')">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setActionForm(action){
+    let form = document.getElementById('auth-form');
+    if (action === 'login'){
+      form.action = "{{url_for('login')}}";
+      form.method = "post";
+      form.submit();
+    }
+    else if (action === 'register'){
+      form.action = "{{url_for('register')}}";
+      form.method = "post";
+      form.submit();
+    }
+  }
+</script>
+
+{% endblock %}
