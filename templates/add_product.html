@@ -7,6 +7,7 @@
     <h2>Add New Product</h2>
 
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input name="name" placeholder="Product Name" required><br><br>
         <input name="brand" placeholder="Brand"><br><br>
 

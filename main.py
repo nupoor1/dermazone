@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+from flask_wtf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 import random
@@ -19,6 +20,7 @@ app.config['SECRET_KEY'] = secrets.token_hex(16)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+csrf = CSRFProtect(app)
 
 # Database Model
 class User(db.Model):
@@ -171,7 +173,7 @@ def predict():
 
         predictions = model.predict(img_array)
         class_index = np.argmax(predictions[0])
-        class_names = ['oily', 'dry', 'normal']
+        class_names = ['dry', 'normal', 'oily']
         prediction = class_names[class_index]
 
         # Save prediction to database

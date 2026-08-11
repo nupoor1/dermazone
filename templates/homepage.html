@@ -71,8 +71,10 @@
         formData.append('file', file);
 
         try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
             const response = await fetch('/predict', {
                 method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
                 body: formData
             });
 

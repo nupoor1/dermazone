@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+instance/
+metrics.txt
+*.egg-info/
+train/
+test/
+valid/
+.claude/

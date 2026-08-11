@@ -2,9 +2,7 @@
 
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-import numpy as np
 import tensorflow as tf
-import pandas as pd
 
 # Loading files/folders needed.
 rawtrain = 'train'
