@@ -17,7 +17,7 @@ dermazone lets a user upload a photo of their face, runs it through a convolutio
 - **Backend:** Flask, Flask-SQLAlchemy (SQLite)
 - **ML:** TensorFlow/Keras (CNN), Pillow + NumPy for image preprocessing
 - **Auth:** Werkzeug password hashing, Flask sessions, Flask-WTF CSRF protection
-- **Frontend:** Jinja2, Tailwind CSS + daisyUI (via CDN), JavaScript
+- **Frontend:** Jinja2, Tailwind CSS + daisyUI, JavaScript
 
 ## Limitations/Improvements
 
